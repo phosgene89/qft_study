@@ -1,0 +1,641 @@
+\documentclass[11pt]{article}
+\usepackage{qftnotes}
+
+\newcommand{\eps}{\varepsilon}
+
+\title{Phase 0 $\cdot$ Classical Mechanics --- Lesson 3: Noether's Theorem}
+\author{Self-study companion to \emph{Quantum Field Theory for the Gifted Amateur}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{tcolorbox}[colback=gray!5,colframe=gray!60!black,title={Lesson overview},breakable]
+\textbf{Prerequisites.} Lesson 1 (action, Euler--Lagrange equations for particles and fields, the Klein--Gordon Lagrangian) and Lesson 2 (Legendre transform, Hamilton's equations, Poisson brackets $\pb{q}{p}=+1$ with $\dot A=\pb{A}{H}+\partial_t A$, field momentum $\pi=\partial\Lag/\partial\dot\phi$).
+
+\textbf{Time estimate.} About 2--3 hours, plus the exercises.
+
+\textbf{Learning goals.} By the end you should be able to:
+\begin{itemize}[nosep]
+  \item prove Noether's theorem for particles and for fields, from scratch;
+  \item produce the conserved charge for translations, rotations, time translation and boosts, and know the Hamiltonian meaning of each (``the charge generates the symmetry'');
+  \item derive the $U(1)$ current of the complex scalar field and the canonical energy--momentum tensor $T^{\mu\nu}$, and check $T^{00}=\Ham$;
+  \item explain, qualitatively, how promoting a global symmetry to a local one forces a gauge field.
+\end{itemize}
+Conventions throughout: $\hbar=c=1$, metric $(+,-,-,-)$, $\partial_\mu=\partial/\partial x^\mu$, so $\partial^\mu=(\partial_t,-\nabla)$. Lancaster \& Blundell is abbreviated L\&B.
+\end{tcolorbox}
+
+\tableofcontents
+
+%=====================================================================
+\section{Motivation: symmetry and conservation}
+%=====================================================================
+
+In classical mechanics you learned three conservation laws (energy, momentum, angular momentum) and probably learned them as three separate facts, each proved by a separate short calculation. Noether's theorem (Emmy Noether, 1918) says they are three instances of a single principle:
+\begin{quote}
+\emph{Every continuous symmetry of the action gives a conserved quantity.}
+\end{quote}
+Time-translation invariance gives energy; space-translation invariance gives momentum; rotation invariance gives angular momentum. The mapping is mechanical, and it is a \emph{recipe}: you hand it a symmetry and it hands you the conserved charge.
+
+This matters enormously in QFT, where symmetry organizes almost everything:
+\begin{itemize}
+  \item Electric charge (and baryon number, lepton number, \dots) is the Noether charge of an internal $U(1)$ phase symmetry.
+  \item Energy and momentum of a field are the Noether charges of spacetime translations, and they are packaged into the \emph{energy--momentum tensor} $T^{\mu\nu}$, the object that sources gravity.
+  \item Gauge theory---electromagnetism, the weak and strong forces---starts by asking what happens if a symmetry is imposed \emph{locally}.
+\end{itemize}
+In a field theory there are infinitely many degrees of freedom and conservation laws must be \emph{local}: charge does not just stay constant, it cannot jump from one place to another; it flows continuously. That is the continuity equation $\partial_\mu J^\mu=0$, which we will derive.
+
+The plan: first the clean mechanics of a finite number of particles (where every step is transparent), then the Hamiltonian reading (charges generate symmetries), then the field-theory version, then the key examples that L\&B uses.
+
+%=====================================================================
+\section{Warm-up: cyclic coordinates}
+%=====================================================================
+
+Recall from Lesson 1 the Euler--Lagrange equation
+\begin{equation}
+  \diff{}{t}\pdiff{L}{\dot q_i}-\pdiff{L}{q_i}=0 .
+\end{equation}
+Define the conjugate momentum $p_i=\partial L/\partial\dot q_i$. Then the equation reads $\dot p_i=\partial L/\partial q_i$. So:
+
+\begin{keyresult}[: cyclic coordinates]
+If $L$ does not depend on the coordinate $q_k$ (it is \emph{cyclic} or \emph{ignorable}), then $p_k=\partial L/\partial\dot q_k$ is conserved.
+\end{keyresult}
+
+Notice what the hypothesis says: $L$ is unchanged under the shift $q_k\to q_k+\eps$. That is a symmetry, and this is the simplest case of Noether's theorem.
+
+\begin{example}[Free particle]
+$L=\tfrac12 m(\dot x^2+\dot y^2+\dot z^2)$ does not contain $x,y,z$. Hence $p_x=m\dot x$, $p_y=m\dot y$, $p_z=m\dot z$ are conserved: translation invariance $\Rightarrow$ momentum conservation.
+\end{example}
+
+\begin{example}[Central potential in the plane]
+For $V=V(r)$ in polar coordinates, $L=\tfrac12 m(\dot r^2+r^2\dot\varphi^2)-V(r)$. The angle $\varphi$ does not appear, so
+\begin{equation}
+  p_\varphi=\pdiff{L}{\dot\varphi}=mr^2\dot\varphi=L_z
+\end{equation}
+is conserved. This is the $z$-component of angular momentum $\vect r\times\vect p$: rotation invariance $\Rightarrow$ angular momentum conservation. (In Cartesian coordinates the symmetry $x\to x-\eps y$, $y\to y+\eps x$ is far from obvious as a ``cyclic coordinate''; the polar coordinate hid it in plain sight. Noether's theorem removes the need to hunt for good coordinates.)
+\end{example}
+
+The limitation is clear: sometimes the symmetry is not a simple shift of a single coordinate (a rotation in Cartesian coordinates; a boost; a time translation). We need the general statement.
+
+%=====================================================================
+\section{Noether's theorem for particles}
+%=====================================================================
+
+\subsection{Infinitesimal symmetries}
+
+Consider a mechanical system with coordinates $q_i(t)$, $i=1,\dots,N$ and Lagrangian $L(q,\dot q,t)$. An \emph{infinitesimal transformation} is
+\begin{equation}
+  q_i(t)\;\longrightarrow\; q_i(t)+\delta q_i(t),\qquad \delta q_i=\eps\,K_i(q,t),
+  \label{eq:dq}
+\end{equation}
+with $\eps$ an infinitesimal constant parameter and $K_i$ a given function (it may depend on $q$, and even on $t$ or $\dot q$) that says \emph{how} the coordinates are moved. The transformation is applied to an entire path, $q_i(t)$ is replaced by $q_i(t)+\eps K_i(q(t),t)$ at each time. Because $\eps$ is constant, the velocities change by
+\begin{equation}
+  \delta\dot q_i=\diff{}{t}\delta q_i=\eps\,\dot K_i,
+  \label{eq:dqdot}
+\end{equation}
+where $\dot K_i=\dd K_i/\dd t$ is the \emph{total} time derivative along the path. We work to first order in $\eps$ throughout.
+
+\begin{definition}[Symmetry]
+The transformation \eqref{eq:dq} is a \emph{symmetry} if the Lagrangian changes only by a total time derivative:
+\begin{equation}
+  \delta L=\eps\diff{F}{t}
+  \label{eq:sym}
+\end{equation}
+for some function $F(q,t)$, for \emph{arbitrary} paths $q(t)$ (not only solutions). The \emph{strict} case is $\delta L=0$, i.e.\ $F=0$.
+\end{definition}
+
+Why is a total derivative allowed? The action is $S=\int L\,\dd t$, so $\delta S=\eps[F]_{t_1}^{t_2}$ is a pure boundary term, which does not affect the equations of motion (recall Lesson 1: $L$ and $L+\dd G/\dd t$ describe the same physics). So \eqref{eq:sym} is the right notion: the symmetry maps solutions to solutions. You will meet important cases in which $F\neq0$ (Galilean boosts below).
+
+\subsection{The theorem and its proof}
+
+\begin{theorem}[Noether, particles]\label{thm:noether-particle}
+If $\delta q_i=\eps K_i$ is a symmetry in the sense of \eqref{eq:sym}, then
+\begin{equation}
+  Q=\sum_i\pdiff{L}{\dot q_i}K_i-F=\sum_i p_iK_i-F
+\end{equation}
+is conserved along every solution of the equations of motion: $\dd Q/\dd t=0$.
+\end{theorem}
+
+\begin{proof}
+Compute $\delta L$ in two ways. First, by the chain rule, using \eqref{eq:dq} and \eqref{eq:dqdot} (there is no variation of $t$, so $\partial L/\partial t$ does not contribute):
+\begin{equation}
+  \delta L=\sum_i\left(\pdiff{L}{q_i}\delta q_i+\pdiff{L}{\dot q_i}\delta\dot q_i\right)
+  =\eps\sum_i\left(\pdiff{L}{q_i}K_i+p_i\dot K_i\right).
+\end{equation}
+Now go \emph{on-shell}, i.e.\ assume $q_i(t)$ solves the Euler--Lagrange equations, so that $\partial L/\partial q_i=\dot p_i$:
+\begin{equation}
+  \delta L=\eps\sum_i\left(\dot p_iK_i+p_i\dot K_i\right)=\eps\diff{}{t}\Big(\sum_ip_iK_i\Big).
+\end{equation}
+Second, by the symmetry assumption, $\delta L=\eps\,\dd F/\dd t$. Equating the two:
+\begin{equation}
+  \eps\diff{}{t}\Big(\sum_ip_iK_i-F\Big)=0 .\qedhere
+\end{equation}
+\end{proof}
+
+The structure of the proof is worth internalizing: the \emph{off-shell} statement ``$\delta L=\eps\dot F$'' is a property of the Lagrangian (the symmetry), while the \emph{on-shell} chain-rule computation converts it into a statement about motion. Conservation holds only on solutions.
+
+\begin{keyresult}[: Noether's theorem (particles)]
+Symmetry $\delta q_i=\eps K_i$, $\delta L=\eps\,\dd F/\dd t$ $\Longrightarrow$ $Q=\sum_i\dfrac{\partial L}{\partial\dot q_i}K_i-F$ is conserved.
+\end{keyresult}
+
+\begin{pitfall}[Sign conventions for $\eps$]
+Whether you write $q\to q+\eps K$ or $q\to q-\eps K$ flips the sign of $K$ and of $Q$, but conservation is unaffected. Also $Q$ is defined only up to an overall constant factor (rescale $\eps$) and up to adding a constant. Do not worry about overall signs when checking conservation; do worry about them when you need $Q$ to equal a \emph{specific} physical quantity such as $+\vect p$ or $+H$, or when you later compare conventions between books (L\&B, Tong, Peskin, \dots).
+\end{pitfall}
+
+\subsection{Worked examples}
+
+\begin{example}[Spatial translation $\Rightarrow$ momentum]
+Take $N$ particles with $L=\sum_a\tfrac12m_a\dot{\vect r}_a^2-V(\vect r_a-\vect r_b)$ and shift every particle by the same vector: $\delta\vect r_a=\eps\vect n$ for a fixed unit vector $\vect n$. So $K_{a}=\vect n$ for every particle. Since $V$ depends only on differences, $\delta L=0$ and $F=0$. Then
+\begin{equation}
+  Q=\sum_a\vect p_a\cdot\vect n=\vect n\cdot\vect P ,
+\end{equation}
+the component of the total momentum along $\vect n$. If the potential also depends on a fixed external source (e.g.\ $V(\vect r)$ not shift-invariant in some direction), the symmetry survives only for those directions $\vect n$ along which $V$ is constant.
+\end{example}
+
+\begin{example}[Rotation $\Rightarrow$ angular momentum]
+Rotate every particle about the axis $\vect n$ ($|\vect n|=1$) through the small angle $\eps$. A rotation by small angle $\eps$ about $\vect n$ moves a position vector as
+\begin{equation}
+  \delta\vect r_a=\eps\,\vect n\times\vect r_a,\qquad K_a=\vect n\times\vect r_a .
+\end{equation}
+(Check: for $\vect n=\hat z$, $\vect r=(x,y,z)$ one gets $\delta\vect r=\eps(-y,x,0)$, which is the counter-clockwise rotation $x\to x\cos\eps-y\sin\eps\approx x-\eps y$, $y\to y+\eps x$.) For a Lagrangian built from scalar products, $\dot{\vect r}_a^2$, $\vect r_a\cdot\vect r_b$, $|\vect r_a-\vect r_b|$, which are rotation invariants, $\delta L=0$. Verify the kinetic term: $\delta(\dot{\vect r}^2)=2\dot{\vect r}\cdot(\eps\,\vect n\times\dot{\vect r})=0$ because $\dot{\vect r}\perp(\vect n\times\dot{\vect r})$. Then
+\begin{equation}
+  Q=\sum_a\vect p_a\cdot(\vect n\times\vect r_a)=\sum_a\vect n\cdot(\vect r_a\times\vect p_a)=\vect n\cdot\vect J ,
+\end{equation}
+where we used the cyclic property of the triple product $\vect a\cdot(\vect b\times\vect c)=\vect b\cdot(\vect c\times\vect a)$. Since this holds for each $\vect n$, all three components of $\vect J=\sum_a\vect r_a\times\vect p_a$ are conserved \emph{if the system is invariant under rotations about all three axes}. For a single particle in a central potential $V(|\vect r|)$ this is true, which is the origin of conservation of the vector $\vect L$ (and hence planar motion). For an axially-symmetric potential only $L_z$ survives.
+\end{example}
+
+\begin{example}[Time translation $\Rightarrow$ energy]
+This one does not look like \eqref{eq:dq}, because it moves the system in \emph{time} rather than in configuration space. But shifting the time origin, $t\to t+\eps$, acts on a given path as
+\begin{equation}
+  q_i(t)\to q_i(t+\eps)=q_i(t)+\eps\dot q_i(t),\qquad\text{i.e.}\quad K_i=\dot q_i .
+\end{equation}
+(Here $K_i$ depends on the velocity; the proof of Theorem~\ref{thm:noether-particle} did not care, since only $\delta\dot q_i=\diff{}{t}\delta q_i$ was used.) Now suppose $L=L(q,\dot q)$ has no explicit time dependence. Then the change in $L$ under this relabelling is simply the change of $L(q(t),\dot q(t))$ under $t\to t+\eps$:
+\begin{equation}
+  \delta L=\sum_i\left(\pdiff{L}{q_i}\eps\dot q_i+\pdiff{L}{\dot q_i}\eps\ddot q_i\right)=\eps\diff{L}{t},
+\end{equation}
+where the last equality uses $\partial L/\partial t=0$. So $F=L$. (Here $F$ depends on $\dot q$ as well as $q$; that is harmless, because the proof only uses $\delta L=\eps\,\dd F/\dd t$ along paths, never the form of $F$.) The conserved charge is
+\begin{equation}
+  Q=\sum_ip_i\dot q_i-L=H,
+\end{equation}
+the Hamiltonian (Lesson 2): conservation of energy. If instead $\partial L/\partial t\ne0$ then $\delta L=\eps(\dd L/\dd t-\partial_tL)$ is not a total derivative, there is no symmetry, and $H$ is not conserved; Exercise~\ref{ex:time-dep} makes this precise.
+\end{example}
+
+\begin{example}[Galilean boost $\Rightarrow$ centre-of-mass motion; a symmetry with $F\neq0$]\label{ex:boost}
+Take the same $N$-particle system, $L=\sum_a\tfrac12m_a\dot{\vect r}_a^2-V(\vect r_a-\vect r_b)$, and change to a frame moving with small velocity $\eps\vect n$:
+\begin{equation}
+  \delta\vect r_a=\eps\,\vect n\,t,\qquad K_a=\vect n\,t\quad(\text{explicitly time dependent}),\qquad \delta\dot{\vect r}_a=\eps\vect n .
+\end{equation}
+The potential depends on differences and is unchanged. The kinetic term changes:
+\begin{equation}
+  \delta L=\sum_am_a\dot{\vect r}_a\cdot\eps\vect n=\eps\diff{}{t}\Big(\vect n\cdot\sum_am_a\vect r_a\Big)=\eps\diff{}{t}\big(M\,\vect n\cdot\vect R\big),
+\end{equation}
+with $M=\sum m_a$ and $\vect R=\sum m_a\vect r_a/M$ the centre of mass. This is nonzero but a total derivative: $F=M\vect n\cdot\vect R$. The charge is
+\begin{equation}
+  Q=\sum_a\vect p_a\cdot\vect n\,t-M\vect n\cdot\vect R=\vect n\cdot\big(\vect P\,t-M\vect R\big).
+\end{equation}
+Conservation of $Q$ for all $\vect n$ says $M\vect R-\vect Pt=\text{const}$, i.e.\
+\begin{equation}
+  \vect R(t)=\vect R(0)+\frac{\vect P}{M}\,t,
+\end{equation}
+the centre of mass moves uniformly. Notice that this is a genuinely new piece of information (it is \emph{not} just momentum conservation; it is the statement that $\dot{\vect R}=\vect P/M$ is constant, which is Newton's second law summed over particles), and that it only appeared because we allowed $F\ne0$ and $t$-dependent $K$.
+\end{example}
+
+\begin{pitfall}[Forgetting $F$]
+If you insisted on $\delta L=0$ you would conclude the boost is not a symmetry, and miss the conservation law. Always compute $\delta L$ and ask whether it is a total derivative. Conversely, don't be fooled by a non-vanishing $\delta L$: it is only a problem if it is \emph{not} a total derivative.
+\end{pitfall}
+
+%=====================================================================
+\section{The Hamiltonian view: charges generate symmetries}
+%=====================================================================
+
+Recall from Lesson 2 that for any function $A(q,p,t)$,
+\begin{equation}
+  \diff{A}{t}=\pb{A}{H}+\pdiff{A}{t},\qquad \pb{A}{B}=\sum_i\left(\pdiff{A}{q_i}\pdiff{B}{p_i}-\pdiff{A}{p_i}\pdiff{B}{q_i}\right),
+\end{equation}
+so $\pb{q_i}{p_j}=+\delta_{ij}$. A quantity $Q(q,p)$ with no explicit time dependence is therefore conserved if and only if
+\begin{equation}
+  \diff{Q}{t}=\pb{Q}{H}=0 .
+\end{equation}
+
+\begin{keyresult}[: charges generate their symmetries]
+The Noether charge $Q$ (for a symmetry with no explicit $t$-dependence) generates the transformation it came from:
+\begin{equation}
+  \delta q_i=\eps\,\pb{q_i}{Q},\qquad \delta p_i=\eps\,\pb{p_i}{Q}.
+\end{equation}
+Moreover, $\pb{Q}{H}=0$ means precisely that $H$ is invariant under this transformation: $\delta H=\eps\pb{H}{Q}=-\eps\pb{Q}{H}=0$.
+\end{keyresult}
+
+We verify the first statement in the two key cases (for the symmetries, $F=0$, $Q=\sum_ip_iK_i$ with $K$ independent of $p$, then $\pb{q_i}{Q}=K_i$ immediately, since $\pb{q_i}{p_j}=\delta_{ij}$; the content is in the check that it also does the right thing to $p$).
+
+\begin{example}[Momentum generates translations]
+Let $Q=\vect n\cdot\vect p$. Then $\pb{x_i}{\vect n\cdot\vect p}=n_j\pb{x_i}{p_j}=n_i$, so $\delta\vect r=\eps\vect n$. And $\pb{p_i}{\vect n\cdot\vect p}=0$: momenta are untouched. Translation invariance of $H$ means $\pb{H}{\vect n\cdot\vect p}=\vect n\cdot\nabla V=0$ (for $H=\vect p^2/2m+V$), i.e.\ $V$ does not change along $\vect n$, as expected.
+\end{example}
+
+\begin{example}[Angular momentum generates rotations]
+Let $Q=\vect n\cdot(\vect r\times\vect p)=\epsilon_{jkl}n_jx_kp_l$ (summation convention). Using $\pb{x_i}{p_l}=\delta_{il}$,
+\begin{equation}
+  \pb{x_i}{Q}=\epsilon_{jkl}n_jx_k\delta_{il}=\epsilon_{jki}n_jx_k=\epsilon_{ijk}n_jx_k=(\vect n\times\vect r)_i,
+\end{equation}
+using the cyclic symmetry of $\epsilon$. So $\delta\vect r=\eps\,\vect n\times\vect r$: exactly the rotation of Section~3. For the momentum, using $\pb{p_i}{x_k}=-\delta_{ik}$,
+\begin{equation}
+  \pb{p_i}{Q}=\epsilon_{jkl}n_j\,\pb{p_i}{x_k}\,p_l=-\epsilon_{jil}n_jp_l=\epsilon_{ijl}n_jp_l=(\vect n\times\vect p)_i,
+\end{equation}
+so $\delta\vect p=\eps\,\vect n\times\vect p$: the momentum vector is rotated in the same way, as it must be for $\vect r$ and $\vect p$ to remain ``vectors''.
+\end{example}
+
+\begin{qftbridge}
+This is one of the most important sentences of the whole course: \emph{the Noether charge is the generator of its symmetry.} In quantum mechanics, $\pb{\cdot}{\cdot}\to-\mathrm i[\cdot,\cdot]$ (Dirac, Lesson 2), a conserved classical $Q$ becomes a Hermitian operator $\hat Q$ with $[\hat Q,\hat H]=0$, and the symmetry transformation is implemented by the \emph{unitary} operator $U=\mathrm e^{\mathrm i\eps\hat Q}$ (up to sign conventions), with $U\hat HU^\dagger=\hat H$. The eigenvalues of $\hat Q$ label states and are conserved in time. In L\&B this appears in ch.~10 (``Symmetry'') and again in ch.~12, where the $U(1)$ charge operator $\hat Q$ counts particles minus antiparticles, and wherever the translation generators become the momentum operator $\hat{\vect P}$ with $\hat{\vect P}\,|\vect p\rangle=\vect p\,|\vect p\rangle$.
+\end{qftbridge}
+
+%=====================================================================
+\section{Noether's theorem for fields}
+%=====================================================================
+
+Now to fields $\phi_a(x)$, $x^\mu=(t,\vect x)$, with action $S=\int\dd^4x\,\Lag(\phi_a,\partial_\mu\phi_a)$. From Lesson 1, the Euler--Lagrange equations are
+\begin{equation}
+  \partial_\mu\left(\pdiff{\Lag}{(\partial_\mu\phi_a)}\right)-\pdiff{\Lag}{\phi_a}=0 .
+  \label{eq:EL-field}
+\end{equation}
+Consider an \emph{internal} transformation (one that rescales/rotates the field values at each point, leaving $x$ alone):
+\begin{equation}
+  \phi_a(x)\to\phi_a(x)+\eps\,\Delta\phi_a(x),
+\end{equation}
+where $\Delta\phi_a$ is a given function of the fields. Then $\delta(\partial_\mu\phi_a)=\eps\,\partial_\mu(\Delta\phi_a)$.
+
+The field analogue of \eqref{eq:sym} is that the Lagrangian density changes by a total \emph{four}-divergence:
+\begin{equation}
+  \delta\Lag=\eps\,\partial_\mu W^\mu
+  \label{eq:sym-field}
+\end{equation}
+for some $W^\mu(\phi)$, for arbitrary field configurations. This leaves the action invariant up to a surface term at the boundary of spacetime, which does not affect the equations of motion. The strict case is $W^\mu=0$.
+
+\begin{theorem}[Noether, fields]\label{thm:noether-field}
+If $\phi_a\to\phi_a+\eps\Delta\phi_a$ satisfies \eqref{eq:sym-field}, then
+\begin{equation}
+  J^\mu=\sum_a\pdiff{\Lag}{(\partial_\mu\phi_a)}\Delta\phi_a-W^\mu
+\end{equation}
+obeys $\partial_\mu J^\mu=0$ on solutions of \eqref{eq:EL-field}.
+\end{theorem}
+
+\begin{proof}
+By the chain rule,
+\begin{equation}
+  \delta\Lag=\eps\sum_a\left[\pdiff{\Lag}{\phi_a}\Delta\phi_a+\pdiff{\Lag}{(\partial_\mu\phi_a)}\partial_\mu(\Delta\phi_a)\right].
+\end{equation}
+On-shell, \eqref{eq:EL-field} gives $\partial\Lag/\partial\phi_a=\partial_\mu\big(\partial\Lag/\partial(\partial_\mu\phi_a)\big)$. Substituting, the two terms combine via the product rule into a divergence:
+\begin{equation}
+  \delta\Lag=\eps\,\partial_\mu\Big[\sum_a\pdiff{\Lag}{(\partial_\mu\phi_a)}\Delta\phi_a\Big].
+\end{equation}
+Setting this equal to $\eps\,\partial_\mu W^\mu$ from \eqref{eq:sym-field} gives $\partial_\mu J^\mu=0$.
+\end{proof}
+
+\paragraph{The conserved charge.} Split the divergence: $\partial_\mu J^\mu=\partial_tJ^0+\nabla\cdot\vect J=0$, where $\vect J=(J^1,J^2,J^3)$. Define
+\begin{equation}
+  Q=\int\dd^3x\,J^0 .
+\end{equation}
+Then
+\begin{equation}
+  \diff{Q}{t}=\int\dd^3x\,\partial_tJ^0=-\int\dd^3x\,\nabla\cdot\vect J=-\oint_{S_\infty}\vect J\cdot\dd\vect S=0,
+\end{equation}
+by the divergence theorem, provided the fields (hence $\vect J$) fall off fast enough at spatial infinity that the surface integral vanishes. (More precisely, $|\vect J|$ must decay faster than $1/r^2$; this holds for configurations of finite energy in all examples here.)
+
+\begin{keyresult}[: Noether's theorem (fields)]
+$\Delta\phi_a$ with $\delta\Lag=\eps\,\partial_\mu W^\mu$ $\Rightarrow$ current $J^\mu=\sum_a\dfrac{\partial\Lag}{\partial(\partial_\mu\phi_a)}\Delta\phi_a-W^\mu$, $\partial_\mu J^\mu=0$, and charge $Q=\int\dd^3x\,J^0$ constant in time.
+\end{keyresult}
+
+Compare with the particle case: $\partial\Lag/\partial(\partial_0\phi_a)=\pi_a$ is the field momentum, so $J^0=\sum_a\pi_a\Delta\phi_a-W^0$ is exactly ``$\sum p_iK_i-F$'' density.
+
+\begin{pitfall}[On-shell only]
+$\partial_\mu J^\mu=0$ holds only when the fields satisfy their equations of motion. Off-shell, $\partial_\mu J^\mu\neq0$ in general (in the proof, the Euler--Lagrange equation was used). This is exactly like particle mechanics, where $Q$ is constant only along true trajectories. In the quantum theory this is the difference between ``Ward identities'' and operator statements, but for now simply remember to use the field equation when you check conservation.
+\end{pitfall}
+
+\begin{pitfall}[Currents are not unique]
+Adding to $J^\mu$ a term $\partial_\nu A^{[\mu\nu]}$ with $A^{[\mu\nu]}=-A^{[\nu\mu]}$ leaves $\partial_\mu J^\mu=0$ intact (because $\partial_\mu\partial_\nu A^{[\mu\nu]}=0$) and does not change $Q$ (the extra piece in $J^0$ is a divergence $\partial_iA^{[0i]}$ that integrates to a surface term). So the current is defined up to such terms, and it is Noether's recipe that selects one representative.
+\end{pitfall}
+
+\begin{example}[Continuity equation]
+For a fluid with density $\rho$ and velocity $\vect v$, $J^\mu=(\rho,\rho\vect v)$ obeys $\partial_\mu J^\mu=\partial_t\rho+\nabla\cdot(\rho\vect v)=0$, the familiar continuity equation: mass cannot vanish here and appear there; it must flow through the intervening space. That is the content of a \emph{local} conservation law. Exercise~\ref{ex:continuity} makes the local--global connection precise.
+\end{example}
+
+%=====================================================================
+\section{Key field examples}
+%=====================================================================
+
+\subsection{The complex scalar field and $U(1)$ charge}
+
+Take a complex scalar field $\psi(x)$ with
+\begin{equation}
+  \Lag=\partial_\mu\psi^*\partial^\mu\psi-m^2\psi^*\psi .
+  \label{eq:Lcomplex}
+\end{equation}
+As in Lesson 1, treat $\psi$ and $\psi^*$ as independent fields. Varying $\psi^*$ gives $(\partial_\mu\partial^\mu+m^2)\psi=0$ and varying $\psi$ gives the conjugate equation: both obey Klein--Gordon.
+
+The Lagrangian depends on $\psi,\psi^*$ only through $\psi^*\psi$ and derivative combinations $\partial\psi^*\partial\psi$, so it is invariant under the global phase rotation
+\begin{equation}
+  \psi\to\mathrm e^{-\mathrm i\alpha}\psi,\qquad \psi^*\to\mathrm e^{+\mathrm i\alpha}\psi^*,\qquad \alpha\in\mathbb R \text{ constant}.
+\end{equation}
+(The group of phases is $U(1)$.) We have chosen the sign $\mathrm e^{-\mathrm i\alpha}$ for a reason explained below. Infinitesimally, with $\alpha=\eps$:
+\begin{equation}
+  \Delta\psi=-\mathrm i\psi,\qquad \Delta\psi^*=+\mathrm i\psi^* .
+\end{equation}
+Because $\psi^*\psi\to\psi^*\psi$ and $\partial_\mu\psi^*\partial^\mu\psi\to\partial_\mu\psi^*\partial^\mu\psi$ (the phase is the same everywhere in spacetime, so it passes through derivatives), $\delta\Lag=0$ and $W^\mu=0$. Theorem~\ref{thm:noether-field}, summing over the two independent fields $\psi,\psi^*$:
+\begin{align}
+  J^\mu&=\pdiff{\Lag}{(\partial_\mu\psi)}\Delta\psi+\pdiff{\Lag}{(\partial_\mu\psi^*)}\Delta\psi^*\notag\\
+  &=\partial^\mu\psi^*\,(-\mathrm i\psi)+\partial^\mu\psi\,(+\mathrm i\psi^*)\notag\\
+  &=\mathrm i\big(\psi^*\partial^\mu\psi-\psi\,\partial^\mu\psi^*\big).
+  \label{eq:Ucurrent}
+\end{align}
+Here $\partial\Lag/\partial(\partial_\mu\psi)=\partial^\mu\psi^*$ since $\Lag\ni\partial_\nu\psi^*\partial^\nu\psi$.
+
+Let us verify $\partial_\mu J^\mu=0$ directly (using the equations of motion):
+\begin{equation}
+  \partial_\mu J^\mu=\mathrm i\big(\partial_\mu\psi^*\partial^\mu\psi+\psi^*\Box\psi-\partial_\mu\psi\partial^\mu\psi^*-\psi\Box\psi^*\big)
+  =\mathrm i\big(\psi^*\Box\psi-\psi\Box\psi^*\big)=\mathrm i\big(-m^2\psi^*\psi+m^2\psi\psi^*\big)=0 ,
+\end{equation}
+with $\Box=\partial_\mu\partial^\mu$ and $\Box\psi=-m^2\psi$. Note this required the field equations (Pitfall above).
+
+\begin{keyresult}[: $U(1)$ current of the complex scalar field]
+With $\psi\to\mathrm e^{-\mathrm i\alpha}\psi$:
+\begin{equation}
+  J^\mu=\mathrm i\big(\psi^*\partial^\mu\psi-\psi\,\partial^\mu\psi^*\big),\qquad Q=\int\dd^3x\,J^0=\mathrm i\int\dd^3x\,\big(\psi^*\dot\psi-\psi\dot\psi^*\big).
+\end{equation}
+\end{keyresult}
+
+\begin{pitfall}[Overall sign and normalization are conventions]
+Had we used $\psi\to\mathrm e^{+\mathrm i\alpha}\psi$ (i.e.\ $\Delta\psi=+\mathrm i\psi$) the same derivation would give $J^\mu=\mathrm i(\psi\partial^\mu\psi^*-\psi^*\partial^\mu\psi)=-J^\mu_{\text{above}}$. Different books pick different signs (and some insert factors of the charge $e$ or a $1/2$). The sign matters physically only in that it decides whether \emph{particle} or \emph{antiparticle} carries $Q=+1$. Our choice is the one in which a positive-frequency mode carries positive charge, as shown next. When you reach L\&B ch.~12, \textbf{check their stated convention} for $J^\mu$ and for the transformation $\psi\to\mathrm e^{\pm\mathrm i\alpha}\psi$ and adjust signs accordingly.
+\end{pitfall}
+
+\paragraph{Interpretation.} The density is $J^0=\mathrm i(\psi^*\dot\psi-\psi\dot\psi^*)$. For a single positive-frequency plane wave $\psi=A\,\mathrm e^{-\mathrm iEt+\mathrm i\vect p\cdot\vect x}$, $\dot\psi=-\mathrm iE\psi$ and $\dot\psi^*=+\mathrm iE\psi^*$, so
+\begin{equation}
+  J^0=\mathrm i\big(-\mathrm iE|\psi|^2-\mathrm iE|\psi|^2\big)=2E|A|^2>0. 
+\end{equation}
+Likewise $J^i=\mathrm i(\psi^*\partial^i\psi-\psi\partial^i\psi^*)=\mathrm i(-\psi^*\partial_i\psi+\psi\partial_i\psi^*)=2p_i|A|^2$, so $\vect J=2\vect p|A|^2=(\vect p/E)J^0$, which is $\rho\vect v$ with $\vect v$ the group velocity, as it should be. A negative-frequency mode $\mathrm e^{+\mathrm iEt}$ gives $J^0<0$. Thus $Q$ counts (number of positive-frequency excitations) $-$ (number of negative-frequency excitations): once quantized, the field has particles of charge $+1$ and antiparticles of charge $-1$. Note that $J^0$ is \emph{not} positive definite in general, so it cannot be interpreted as a probability density as in non-relativistic QM---a historical headache for the Klein--Gordon equation, resolved by QFT.
+
+In Hamiltonian language, $\pi=\partial\Lag/\partial\dot\psi=\dot\psi^*$ and $\pi^*=\dot\psi$, so $Q=\mathrm i\int\dd^3x\,(\psi^*\pi^*-\psi\pi)$; Exercise~\ref{ex:Qgenerates} checks that $Q$ generates the phase rotation via $\delta\psi=\eps\pb{\psi}{Q}$.
+
+\begin{qftbridge}
+This is L\&B ch.~12 (the complex scalar field). There $\hat\psi$ contains annihilation operators $\hat a_{\vect p}$ for particles and creation operators $\hat b^\dagger_{\vect p}$ for antiparticles, and the Noether charge $\hat Q$ becomes (up to normal ordering) $\sum_{\vect p}(\hat a^\dagger_{\vect p}\hat a_{\vect p}-\hat b^\dagger_{\vect p}\hat b_{\vect p})$, number of particles minus antiparticles. That $[\hat Q,\hat H]=0$ means this difference is conserved in every interaction that respects the symmetry; e.g.\ particle--antiparticle pairs are created together. Ch.~10 discusses the same structure for a general internal symmetry.
+\end{qftbridge}
+
+\subsection{Spacetime translations and the energy--momentum tensor}
+
+Now consider the symmetry that is not internal: translations of spacetime,
+\begin{equation}
+  x^\mu\to x^\mu+\eps^\mu\quad\Longrightarrow\quad \phi(x)\to\phi(x+\eps)=\phi(x)+\eps^\nu\partial_\nu\phi(x) .
+\end{equation}
+(The sign: we shift the \emph{argument}, as with $q(t+\eps)$ in the time-translation example. The fields are evaluated at the displaced point.) So $\Delta_{(\nu)}\phi=\partial_\nu\phi$, one transformation for each of the four values of $\nu$ (take $\eps^\nu$ nonzero only for one $\nu$ at a time). If $\Lag$ has no explicit $x$-dependence (the Lagrangian density is built only from $\phi$ and $\partial\phi$), then $\Lag$ is just a scalar function evaluated at the new point, so
+\begin{equation}
+  \delta\Lag=\eps^\nu\partial_\nu\Lag=\eps^\nu\,\partial_\mu\big(\delta^\mu_{\ \nu}\Lag\big),\qquad\text{so}\qquad W^\mu_{(\nu)}=\delta^\mu_{\ \nu}\Lag .
+\end{equation}
+Theorem~\ref{thm:noether-field} gives four conserved currents, one for each $\nu$:
+\begin{equation}
+  (J^\mu)_{\ \nu}=\pdiff{\Lag}{(\partial_\mu\phi)}\,\partial_\nu\phi-\delta^\mu_{\ \nu}\Lag .
+\end{equation}
+Raising the index $\nu$ with the metric defines the (canonical) energy--momentum tensor:
+
+\begin{keyresult}[: canonical energy--momentum tensor]
+\begin{equation}
+  T^{\mu\nu}=\pdiff{\Lag}{(\partial_\mu\phi)}\,\partial^\nu\phi-g^{\mu\nu}\Lag,\qquad \partial_\mu T^{\mu\nu}=0 .
+\end{equation}
+(For several fields, sum the first term over fields.) For each fixed $\nu$, $P^\nu=\int\dd^3x\,T^{0\nu}$ is conserved.
+\end{keyresult}
+
+\begin{example}[Real Klein--Gordon field]
+$\Lag=\tfrac12\partial_\mu\phi\partial^\mu\phi-\tfrac12m^2\phi^2=\tfrac12\dot\phi^2-\tfrac12(\nabla\phi)^2-\tfrac12m^2\phi^2$. Here $\partial\Lag/\partial(\partial_\mu\phi)=\partial^\mu\phi$, so
+\begin{equation}
+  T^{\mu\nu}=\partial^\mu\phi\,\partial^\nu\phi-g^{\mu\nu}\Lag .
+\end{equation}
+\emph{Energy density.} $\mu=\nu=0$, $g^{00}=1$:
+\begin{equation}
+  T^{00}=\dot\phi^2-\Lag=\dot\phi^2-\tfrac12\dot\phi^2+\tfrac12(\nabla\phi)^2+\tfrac12m^2\phi^2=\tfrac12\dot\phi^2+\tfrac12(\nabla\phi)^2+\tfrac12m^2\phi^2 .
+\end{equation}
+With $\pi=\partial\Lag/\partial\dot\phi=\dot\phi$ this is $\tfrac12\pi^2+\tfrac12(\nabla\phi)^2+\tfrac12m^2\phi^2=\Ham$, the Hamiltonian density from Lesson 2. In general $T^{00}=\pi\dot\phi-\Lag=\Ham$, the field version of $H=p\dot q-L$. Thus $P^0=\int\dd^3x\,T^{00}=H$, the energy, is conserved.
+
+\emph{Momentum density.} $\mu=0$, $\nu=i$, with $g^{0i}=0$:
+\begin{equation}
+  T^{0i}=\dot\phi\,\partial^i\phi=-\dot\phi\,\partial_i\phi=-\pi\,\partial_i\phi .
+\end{equation}
+So the conserved field momentum is
+\begin{equation}
+  P^i=\int\dd^3x\,T^{0i}=-\int\dd^3x\,\pi\,\partial_i\phi,\qquad\text{i.e.}\quad \vect P=-\int\dd^3x\,\pi\,\nabla\phi .
+\end{equation}
+Sanity check, via the Hamiltonian view of Section~4: with $\pb{\phi(\vect x)}{\pi(\vect y)}=\delta^3(\vect x-\vect y)$ one finds $\pb{\phi(\vect x)}{\vect P}=-\nabla\phi(\vect x)$, so $\delta\phi=\eps\,\pb{\phi}{\vect n\cdot\vect P}=-\eps\,\vect n\cdot\nabla\phi=\phi(\vect x-\eps\vect n)-\phi(\vect x)$: $\vect P$ moves the field profile \emph{forward} by $\eps\vect n$, as a momentum should. This does not contradict the transformation $\phi(x+\eps)$ used to derive $T^{\mu\nu}$: the Noether charge for $\Delta\phi=\partial_i\phi$ is $\int\pi\,\partial_i\phi=-P^i$, because $\partial_i=-\partial^i$; the sign flip is the usual $P_i=-P^i$ bookkeeping.
+\end{example}
+
+\begin{pitfall}[Index placement in $T^{\mu\nu}$]
+The first index $\mu$ is the \emph{current} index: $\partial_\mu T^{\mu\nu}=0$ is a conservation law, and $T^{0\nu}$ is the density of the charge $P^\nu$. The second index $\nu$ labels \emph{which} charge. With $\nu=0$ you get energy, with $\nu=i$ momentum $P^i$. Note $T^{0i}$ (momentum density) and $T^{i0}$ (energy flux) agree for the scalar field but need not in general. Also, $\partial^\nu\phi$ has an upper index: $\partial^i=-\partial_i$, which is the source of the minus sign in $\vect P=-\int\pi\nabla\phi$.
+\end{pitfall}
+
+\begin{pitfall}[Canonical $T^{\mu\nu}$ is not unique and not always symmetric]
+For the scalar field $T^{\mu\nu}$ is symmetric, but for fields with spin (e.g.\ the electromagnetic field) the canonical tensor in general is not, and it is not gauge-invariant for Maxwell theory. One can add $\partial_\lambda B^{\lambda\mu\nu}$ with $B^{\lambda\mu\nu}=-B^{\mu\lambda\nu}$ without spoiling $\partial_\mu T^{\mu\nu}=0$ or changing $P^\nu$ (Belinfante's procedure produces a symmetric, gauge-invariant version, which is the one coupled to gravity). A massless scalar can also be ``improved'' to make it traceless (Exercise~\ref{ex:trace}).
+\end{pitfall}
+
+\begin{qftbridge}
+In L\&B (ch.~10, and again in ch.~11 when the Klein--Gordon field is quantized) the total momentum operator $\hat{\vect P}=-\int\dd^3x\,\hat\pi\,\nabla\hat\phi$ and the Hamiltonian $\hat H=\int\Ham\,\dd^3x$ are the generators of translations; in terms of mode operators they become $\sum_{\vect p}\vect p\,\hat a^\dagger_{\vect p}\hat a_{\vect p}$ and $\sum_{\vect p}E_{\vect p}\hat a^\dagger_{\vect p}\hat a_{\vect p}$. Seeing $T^{00}=\Ham$ here is the reason the Hamiltonian you build from the Legendre transform is ``the'' energy.
+\end{qftbridge}
+
+\subsection{Lorentz transformations (statement only)}
+
+Lorentz transformations $x^\mu\to\Lambda^\mu{}_\nu x^\nu$ also leave a relativistic action invariant. Applying Noether's theorem (with the transformation now acting on both the argument and, for fields with spin, the field components) yields a rank-3 current $\mathcal M^{\lambda\mu\nu}$ antisymmetric in $\mu\nu$, with six conserved charges $M^{\mu\nu}=\int\dd^3x\,\mathcal M^{0\mu\nu}$. Three of them ($M^{ij}$) are the components of angular momentum, which for a scalar field has the form $\vect J=\int\dd^3x\,\vect x\times(\text{momentum density})$, i.e.\ $J^{ij}=\int\dd^3x\,(x^iT^{0j}-x^jT^{0i})$. The other three ($M^{0i}$) are the \emph{boost charges}, the relativistic counterpart of the Galilean combination $\vect Pt-M\vect R$ above: they are $K^i=\int\dd^3x\,(x^iT^{00}-tT^{0i})$, expressing that the energy centroid moves with velocity $\vect P/E$.
+
+\begin{qftbridge}
+The full set of Lorentz charges (spin plus orbital angular momentum) returns when L\&B reach spinors and the Dirac field (Part~IX, from ch.~36); at this stage all you need is that $T^{\mu\nu}$ and the $U(1)$ current are the two conserved objects used repeatedly in the early chapters.
+\end{qftbridge}
+
+%=====================================================================
+\section{Local versus global symmetry: a preview}
+%=====================================================================
+
+The phase rotation above used a \emph{constant} $\alpha$ (a \emph{global} symmetry): the same rotation everywhere in spacetime. What if we demand invariance under $\psi\to\mathrm e^{\mathrm i\alpha(x)}\psi$ with $\alpha$ depending on position (a \emph{local} or \emph{gauge} symmetry)? Then $\partial_\mu\psi\to\mathrm e^{\mathrm i\alpha}\big(\partial_\mu\psi+\mathrm i(\partial_\mu\alpha)\psi\big)$ and the kinetic term is no longer invariant: the extra piece is $\propto\partial_\mu\alpha$.
+
+The fix is to introduce a new field $A_\mu(x)$ and replace $\partial_\mu\to D_\mu=\partial_\mu+\mathrm iqA_\mu$, with $A_\mu\to A_\mu-\tfrac1q\partial_\mu\alpha$ when $\psi\to\mathrm e^{\mathrm i\alpha}\psi$. Then $D_\mu\psi\to\mathrm e^{\mathrm i\alpha}D_\mu\psi$, and
+\begin{equation}
+  \Lag=(D_\mu\psi)^*(D^\mu\psi)-m^2\psi^*\psi=\partial_\mu\psi^*\partial^\mu\psi-m^2\psi^*\psi\;-\;qA_\mu\,\mathrm i\big(\psi^*\partial^\mu\psi-\psi\partial^\mu\psi^*\big)+q^2A_\mu A^\mu\psi^*\psi .
+\end{equation}
+The middle term is $-qA_\mu J^\mu$ with $J^\mu$ precisely the Noether current \eqref{eq:Ucurrent}: the gauge field couples to the conserved current, which is how electromagnetic coupling $-A_\mu J^\mu$ arises. The new field $A_\mu$ needs its own gauge-invariant kinetic term, $-\tfrac14F_{\mu\nu}F^{\mu\nu}$ with $F_{\mu\nu}=\partial_\mu A_\nu-\partial_\nu A_\mu$, which is Maxwell's theory. (Conventions for the sign of $q$ and the relative sign in $D_\mu$ vary between textbooks.) The punchline: \emph{demanding local $U(1)$ symmetry forces the existence of the photon and fixes its coupling to the Noether current.}
+
+\begin{qftbridge}
+This is the subject of L\&B ch.~14 on gauge fields, and of the chapters on quantum electrodynamics that follow. The other half of the story---the global symmetry's Noether current is conserved, but the local symmetry's ``current'' is tied to the gauge field's equation of motion $\partial_\mu F^{\mu\nu}=qJ^\nu$ (up to sign conventions), whose divergence gives $\partial_\nu J^\nu=0$ identically---is worth rereading when you get there.
+\end{qftbridge}
+
+%=====================================================================
+\section{Summary}
+%=====================================================================
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Symmetry} & \textbf{Transformation} & \textbf{Conserved quantity}\\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Particles}}\\
+Cyclic coordinate $q_k$ & $\delta q_k=\eps$ & $p_k=\partial L/\partial\dot q_k$\\
+Space translation along $\vect n$ & $\delta\vect r_a=\eps\vect n$ & $\vect n\cdot\vect P$\\
+Rotation about $\vect n$ & $\delta\vect r_a=\eps\,\vect n\times\vect r_a$ & $\vect n\cdot\vect J$, $\vect J=\sum\vect r_a\times\vect p_a$\\
+Time translation & $\delta q=\eps\dot q$, $F=L$ & $H=\sum p\dot q-L$\\
+Galilean boost & $\delta\vect r_a=\eps\vect nt$, $F=M\vect n\!\cdot\!\vect R$ & $\vect n\cdot(\vect Pt-M\vect R)$\\[2pt]
+\midrule
+\multicolumn{3}{@{}l}{\emph{Fields}}\\
+$U(1)$ phase, $\psi\to\mathrm e^{-\mathrm i\alpha}\psi$ & $\Delta\psi=-\mathrm i\psi$ & $J^\mu=\mathrm i(\psi^*\partial^\mu\psi-\psi\partial^\mu\psi^*)$, $Q=\int J^0$\\
+Spacetime translation & $\Delta\phi=\partial_\nu\phi$ & $T^{\mu\nu}=\frac{\partial\Lag}{\partial(\partial_\mu\phi)}\partial^\nu\phi-g^{\mu\nu}\Lag$; $P^\nu=\int T^{0\nu}$\\
+Lorentz rotations & --- & $J^{ij}$ (angular momentum), boost charges $K^i$\\
+\bottomrule
+\end{tabular}
+\caption{Symmetry $\leftrightarrow$ conserved quantity.}
+\end{table}
+
+\begin{tcolorbox}[colback=yellow!5,colframe=yellow!40!black,title={Know cold},breakable]
+\begin{itemize}[nosep]
+  \item Definition: $\delta q=\eps K$ is a symmetry if $\delta L=\eps\,\dd F/\dd t$; then $Q=\sum_i p_iK_i-F$ is conserved. Be able to reproduce the three-line proof.
+  \item $\delta\Lag=\eps\partial_\mu W^\mu$ $\Rightarrow$ $J^\mu=\frac{\partial\Lag}{\partial(\partial_\mu\phi)}\Delta\phi-W^\mu$, $\partial_\mu J^\mu=0$, $Q=\int J^0$ constant (given falloff at infinity). Both require the equations of motion.
+  \item Translation $\to$ $\vect p$; rotation $\to$ $\vect r\times\vect p$; time translation (with $F=L$) $\to$ $H$; boost has $F\ne0$.
+  \item Charges generate: $\delta q=\eps\pb{q}{Q}$; $\pb{Q}{H}=0$. Quantum: $[\hat Q,\hat H]=0$, $U=\mathrm e^{\mathrm i\eps\hat Q}$ unitary.
+  \item $U(1)$ current $J^\mu=\mathrm i(\psi^*\partial^\mu\psi-\psi\partial^\mu\psi^*)$ (sign conventional); positive-frequency modes carry $Q>0$.
+  \item $T^{\mu\nu}=\frac{\partial\Lag}{\partial(\partial_\mu\phi)}\partial^\nu\phi-g^{\mu\nu}\Lag$; $T^{00}=\Ham$; $T^{0i}=-\pi\partial_i\phi$.
+  \item Gauging $U(1)$ introduces $A_\mu$ with $D_\mu=\partial_\mu+\mathrm iqA_\mu$ and coupling $-qA_\mu J^\mu$.
+\end{itemize}
+\end{tcolorbox}
+
+%=====================================================================
+\section{Exercises}
+%=====================================================================
+
+Solutions are collected in Section~\ref{sec:solutions}. Try each before looking.
+
+\begin{exercise}[Uniform gravity]\label{ex:gravity}
+A particle of mass $m$ moves in the potential $V=mgz$. Write $L$. Which components of linear momentum are conserved? Is angular momentum conserved about any axis? Identify the symmetry associated with each conserved quantity, and find also the conserved quantity associated with a boost in the $x$-direction.
+\end{exercise}
+
+\begin{exercise}[Screw symmetry]\label{ex:screw}
+In cylindrical coordinates $(\rho,\varphi,z)$ a particle of mass $m$ has Lagrangian $L=\tfrac12m(\dot\rho^2+\rho^2\dot\varphi^2+\dot z^2)-V(\rho,\,z-c\varphi)$, with $c$ a constant (a helical potential; $2\pi c$ is the pitch). Identify the symmetry (a rotation combined with a translation), find $K$, and compute the Noether charge. Then repeat for $V(\rho,\varphi-kz)$ and compare the results (which combination of $L_z$ and $p_z$ is conserved in each case?). Check the signs by differentiating the charge directly.
+\end{exercise}
+
+\begin{exercise}[Dilatation of an inverse-square potential]\label{ex:dilatation}
+A particle in three dimensions has $L=\tfrac12m\dot{\vect r}^2-\lambda/r^2$. Consider the scaling $\vect r'(t)=\mu\vect r(t/\mu^2)$. Take $\mu=1+\eps$ and show that $\delta\vect r=\eps(\vect r-2t\dot{\vect r})$, that $\delta L=-2\eps\,\dd(tL)/\dd t$, and hence that $D=\vect p\cdot\vect r-2tH$ is conserved. Verify by direct differentiation. (For the Kepler potential $\propto1/r$ the same scaling maps solutions to solutions but does \emph{not} give a conserved charge as $\delta L$ is not a total derivative; why?)
+\end{exercise}
+
+\begin{exercise}[Angular momentum brackets]\label{ex:Lz}
+With $\pb{x_i}{p_j}=\delta_{ij}$ show that $\pb{L_z}{x}=y$, $\pb{L_z}{y}=-x$, $\pb{L_z}{z}=0$, and the same for $p$. Hence show $\pb{L_z}{r^2}=0$ and $\pb{L_z}{\vect p^2}=0$ and conclude that $L_z$ is conserved for $H=\vect p^2/2m+V(r)$. Finally show $\pb{L_x}{L_y}=L_z$.
+\end{exercise}
+
+\begin{exercise}[$SO(2)$ model and the complex field]\label{ex:SO2}
+Two real fields have $\Lag=\tfrac12(\partial_\mu\phi_1)^2+\tfrac12(\partial_\mu\phi_2)^2-\tfrac12m^2(\phi_1^2+\phi_2^2)$. Show this is invariant under the rotation $\phi_1\to\phi_1+\eps\phi_2$, $\phi_2\to\phi_2-\eps\phi_1$ and compute the Noether current. Show it equals \eqref{eq:Ucurrent} when $\psi=(\phi_1+\mathrm i\phi_2)/\sqrt2$, and that $\Lag$ equals \eqref{eq:Lcomplex}.
+\end{exercise}
+
+\begin{exercise}[Massless scalar: $T^{\mu\nu}$ and its trace]\label{ex:trace}
+For $\Lag=\tfrac12\partial_\mu\phi\partial^\mu\phi$ in $3+1$ dimensions, compute $T^{\mu\nu}$, check $\partial_\mu T^{\mu\nu}=0$ on-shell, and compute the trace $T^\mu{}_\mu$. Show it is nonzero. Show that the ``improved'' tensor $\tilde T^{\mu\nu}=T^{\mu\nu}-\tfrac16(\partial^\mu\partial^\nu-g^{\mu\nu}\Box)\phi^2$ is still conserved, has the same $P^\nu$, and is traceless on-shell.
+\end{exercise}
+
+\begin{exercise}[Boost in a uniform force field]\label{ex:boostforce}
+A particle moves in one dimension with $L=\tfrac12m\dot x^2+fx$, with $f$ constant. Show that $\delta x=\eps t$ is a symmetry with $F\neq0$, find $F$, and compute $Q$. Verify that $Q$ is conserved, and interpret.
+\end{exercise}
+
+\begin{exercise}[Continuity and charge in a volume]\label{ex:continuity}
+Let $\partial_\mu J^\mu=0$ and let $Q_V(t)=\int_V\dd^3x\,J^0$ for a fixed region $V$ with boundary $S$. Show that $\dot Q_V=-\oint_S\vect J\cdot\dd\vect S$, and explain why this shows that charge can change in $V$ only by flowing across $S$. Deduce $\dot Q=0$ for $V=\mathbb R^3$.
+\end{exercise}
+
+\begin{exercise}[Explicit time dependence]\label{ex:time-dep}
+Show that $\dd H/\dd t=-\partial L/\partial t$ on-shell for $L(q,\dot q,t)$. Explain in terms of Noether's theorem why $H$ is not conserved for $L=\tfrac12m\dot x^2-\tfrac12k(t)x^2$ with time-dependent $k$.
+\end{exercise}
+
+\begin{exercise}[Adding a total derivative]\label{ex:ambiguity}
+Let $L'=L+\dd G(q,t)/\dd t$. Show that $L'$ has the same symmetry $\delta q_i=\eps K_i$ with $\delta L'=\eps\,\dd F'/\dd t$ for $F'=F+\sum_iK_i\,\partial G/\partial q_i$ and that the Noether charge is the same: $Q'=Q$.
+\end{exercise}
+
+\begin{exercise}[$U(1)$ charge generates phase rotations]\label{ex:Qgenerates}
+For the complex scalar field use the canonical Poisson brackets $\pb{\psi(\vect x)}{\pi(\vect y)}=\delta^3(\vect x-\vect y)$, $\pb{\psi^*(\vect x)}{\pi^*(\vect y)}=\delta^3(\vect x-\vect y)$ with all others vanishing. Write $Q$ in terms of $\psi,\pi$ and show $\pb{\psi}{Q}=-\mathrm i\psi$ and $\pb{\psi^*}{Q}=\mathrm i\psi^*$, so that $\delta\psi=\eps\pb{\psi}{Q}$ reproduces $\Delta\psi=-\mathrm i\psi$.
+\end{exercise}
+
+%=====================================================================
+\section{Solutions}\label{sec:solutions}
+%=====================================================================
+
+\begin{solution}{ex:gravity}
+$L=\tfrac12m(\dot x^2+\dot y^2+\dot z^2)-mgz$. The coordinates $x,y$ are cyclic, so $p_x=m\dot x$ and $p_y=m\dot y$ are conserved (translations in the horizontal plane). $p_z=m\dot z$ is \emph{not} conserved ($\dot p_z=-mg$): $L$ depends on $z$. Rotation about $z$ ($\delta x=-\eps y$, $\delta y=\eps x$) leaves $\dot x^2+\dot y^2$ invariant and $V$ is independent of $x,y$, so $L_z=m(x\dot y-y\dot x)$ is conserved. Rotation about $x$ or $y$ changes $z$ and hence $V$ (not a total derivative), so $L_x,L_y$ are not conserved: $\dot{\vect L}=\vect r\times\vect F$ with $\vect F=-mg\hat z$ has nonzero $x,y$ components. The energy $E=\tfrac12m\dot{\vect r}^2+mgz$ is conserved ($L$ has no explicit $t$). Boost in $x$: $\delta x=\eps t$, $\delta\dot x=\eps$, $\delta L=m\dot x\,\eps=\eps\,\dd(mx)/\dd t$, so $F=mx$ and $Q=p_xt-mx=m(\dot xt-x)$. Check: $\dot Q=m\ddot xt+m\dot x-m\dot x=0$ since $\ddot x=0$. A boost in $z$ is also a symmetry, now with a $t$-dependent $F$: $\delta z=\eps t$ gives $\delta L=\eps(m\dot z-mgt)=\eps\,\dd(mz-\tfrac12mgt^2)/\dd t$, so $Q=m\dot zt-mz+\tfrac12mgt^2$, and $\dot Q=t(m\ddot z+mg)=0$ \checkmark. (This is the 3D version of Exercise~\ref{ex:boostforce}.)
+\end{solution}
+
+\begin{solution}{ex:screw}
+Take $\varphi\to\varphi+\eps$ and $z\to z+c\eps$ (so $z-c\varphi$ is unchanged; $\rho$ unchanged). Thus $K_\varphi=1$, $K_z=c$. $\dot\varphi,\dot z,\rho$ are unchanged, so $\delta L=0$, $F=0$. Then
+\begin{equation}
+  Q=p_\varphi K_\varphi+p_zK_z=m\rho^2\dot\varphi+c\,m\dot z=L_z+c\,p_z .
+\end{equation}
+Direct check: $\dot p_\varphi=\partial L/\partial\varphi=-\partial_2V\cdot(-c)=c\,\partial_2V$, where $\partial_2V$ denotes derivative with respect to the second argument $u=z-c\varphi$ (since $\partial u/\partial\varphi=-c$ and $\partial L/\partial\varphi=-V_u\cdot(-c)=+cV_u$); and $\dot p_z=\partial L/\partial z=-V_u$. So $\dot p_\varphi+c\,\dot p_z=cV_u-cV_u=0$ \checkmark. For $V(\rho,\varphi-kz)$ the invariant combination $v=\varphi-kz$ requires $\delta\varphi=k\,\delta z$: $K_z=1,K_\varphi=k$, giving $Q=p_z+k\,L_z$. Check: $\dot p_\varphi=-V_v$, $\dot p_z=+kV_v$, so $\dot p_z+k\dot p_\varphi=kV_v-kV_v=0$ \checkmark. The two are consistent: $\varphi-kz=-k(z-c\varphi)$ with $c=1/k$, and $p_z+kL_z=k(L_z+c\,p_z)$. So ``$L_z+c\,p_z$'' goes with $V(\rho,z-c\varphi)$, whereas $V(\rho,\varphi-kz)$ gives $p_z+kL_z$ (not $L_z+kp_z$). General rule: the coefficient multiplying $p_z$ relative to $L_z$ is the amount of $z$-translation accompanying a unit rotation.
+\end{solution}
+
+\begin{solution}{ex:dilatation}
+$\vect r'(t)=\mu\vect r(t/\mu^2)$. With $\mu=1+\eps$: $\vect r'(t)=(1+\eps)\vect r(t(1-2\eps))=\vect r+\eps(\vect r-2t\dot{\vect r})$, so $K=\vect r-2t\dot{\vect r}$. Then $\delta\dot{\vect r}=\eps(\dot{\vect r}-2\dot{\vect r}-2t\ddot{\vect r})=-\eps(\dot{\vect r}+2t\ddot{\vect r})$. With $T=\tfrac12m\dot{\vect r}^2$:
+\begin{equation}
+  \delta T=m\dot{\vect r}\cdot\delta\dot{\vect r}=-\eps\big(m\dot{\vect r}^2+2tm\dot{\vect r}\cdot\ddot{\vect r}\big)=-\eps\Big(2T+2t\diff Tt\Big).
+\end{equation}
+For $V=\lambda r^{-2}$, $\delta(r^2)=2\vect r\cdot\delta\vect r=2\eps(r^2-2t\vect r\cdot\dot{\vect r})=2\eps\,r^2+2\eps t\cdot(-2\vect r\cdot\dot{\vect r})$. Since $\delta(r^{-2})=-r^{-4}\delta(r^2)$ and $\dd(r^{-2})/\dd t=-2r^{-4}\vect r\cdot\dot{\vect r}$:
+\begin{equation}
+  \delta V=\lambda\,\delta(r^{-2})=\eps\lambda\big(-2r^{-2}+4t\,r^{-4}\vect r\cdot\dot{\vect r}\big)=\eps\Big(-2V-2t\diff Vt\Big).
+\end{equation}
+Therefore $\delta L=\delta T-\delta V=\eps\big(-2(T-V)-2t\,\dd(T-V)/\dd t\big)=-2\eps\big(L+t\dot L\big)=-2\eps\,\dd(tL)/\dd t$: $F=-2tL$. The charge is
+\begin{equation}
+  Q=\vect p\cdot K-F=\vect p\cdot\vect r-2t\,\vect p\cdot\dot{\vect r}+2tL=\vect p\cdot\vect r-2tH=D .
+\end{equation}
+Direct check: $\diff{}{t}(\vect p\cdot\vect r)=\dot{\vect p}\cdot\vect r+\vect p\cdot\dot{\vect r}=-\vect r\cdot\nabla V+2T$. For $V\propto r^{-2}$, Euler's theorem gives $\vect r\cdot\nabla V=-2V$, so this is $2V+2T=2E$. And $\diff{}{t}(2tH)=2E$ since $H$ is conserved. Hence $\dot D=0$ \checkmark. For $V=-k/r$: $\vect r\cdot\nabla V=-V$, $\diff{(\vect p\cdot\vect r)}{t}=2T+V\ne2E$; the scaling $\vect r\to\mu\vect r$, $t\to\mu^{3/2}t$ maps solutions to solutions (Kepler's third law $T^2\propto a^3$) but it rescales the action by a constant factor $\mu^{1/2}$ rather than leaving it invariant, so it is not a symmetry of the action in the sense of \eqref{eq:sym} and no Noether charge results. (A symmetry must have $\delta L$ a total derivative with the action unchanged, not merely scaled.)
+\end{solution}
+
+\begin{solution}{ex:Lz}
+$L_z=xp_y-yp_x$. Using $\pb{x_i}{p_j}=\delta_{ij}$ and Leibniz: $\pb{L_z}{x}=\pb{xp_y}{x}-\pb{yp_x}{x}=0-y\pb{p_x}{x}=-y(-1)=y$. $\pb{L_z}{y}=x\pb{p_y}{y}=-x$. $\pb{L_z}{z}=0$. For momenta: $\pb{L_z}{p_x}=\pb{xp_y}{p_x}-\pb{yp_x}{p_x}=p_y\pb{x}{p_x}=p_y$; $\pb{L_z}{p_y}=-p_x\pb{y}{p_y}=-p_x$; $\pb{L_z}{p_z}=0$. So $\pb{L_z}{\cdot}$ acts on $(x,y)$ and $(p_x,p_y)$ as $(\cdot)\mapsto(+y,-x)$ and $(+p_y,-p_x)$. Since $\pb{x}{L_z}=-y$, $\pb{y}{L_z}=x$, $\delta\vect r=\eps\pb{\vect r}{L_z}=\eps(-y,x,0)=\eps\hat z\times\vect r$ \checkmark (rotation), and $\delta\vect p=\eps\pb{\vect p}{L_z}=\eps(-p_y,p_x,0)=\eps\hat z\times\vect p$. Then $\pb{L_z}{r^2}=2x\,y+2y(-x)=0$ and $\pb{L_z}{\vect p^2}=2p_xp_y+2p_y(-p_x)=0$. For $H=\vect p^2/2m+V(r)$, $\pb{L_z}{V(r)}=V'(r)\pb{L_z}{r}=0$ since $\pb{L_z}{r^2}=0$. So $\pb{L_z}{H}=0$ and $\dot L_z=\pb{L_z}{H}=0$ \checkmark. Finally $L_x=yp_z-zp_y$, $L_y=zp_x-xp_z$: the only nonvanishing brackets are $\pb{yp_z}{zp_x}=y\pb{p_z}{z}p_x=-yp_x$ and $\pb{-zp_y}{-xp_z}=\pb{zp_y}{xp_z}=x\pb{z}{p_z}p_y=xp_y$ (the cross-pairs $\pb{yp_z}{-xp_z}$ and $\pb{-zp_y}{zp_x}$ vanish). Total: $xp_y-yp_x=L_z$ \checkmark.
+\end{solution}
+
+\begin{solution}{ex:SO2}
+Under $\delta\phi_1=\eps\phi_2$, $\delta\phi_2=-\eps\phi_1$: $\delta(\phi_1^2+\phi_2^2)=2\eps(\phi_1\phi_2-\phi_2\phi_1)=0$ and likewise $\delta[(\partial\phi_1)^2+(\partial\phi_2)^2]=2\eps(\partial\phi_1\cdot\partial\phi_2-\partial\phi_2\cdot\partial\phi_1)=0$. So $\delta\Lag=0$, $W^\mu=0$, $\Delta\phi_1=\phi_2$, $\Delta\phi_2=-\phi_1$. With $\partial\Lag/\partial(\partial_\mu\phi_a)=\partial^\mu\phi_a$:
+\begin{equation}
+  J^\mu=\partial^\mu\phi_1\,\phi_2+\partial^\mu\phi_2\,(-\phi_1)=\phi_2\partial^\mu\phi_1-\phi_1\partial^\mu\phi_2 .
+\end{equation}
+Complex field: $\psi=(\phi_1+\mathrm i\phi_2)/\sqrt2$. Then $\partial\psi^*\!\cdot\partial\psi=\tfrac12(\partial\phi_1-\mathrm i\partial\phi_2)\!\cdot\!(\partial\phi_1+\mathrm i\partial\phi_2)=\tfrac12[(\partial\phi_1)^2+(\partial\phi_2)^2]$ and $\psi^*\psi=\tfrac12(\phi_1^2+\phi_2^2)$, so $\Lag$ coincides with \eqref{eq:Lcomplex}. Also $\delta\psi=\tfrac1{\sqrt2}(\eps\phi_2-\mathrm i\eps\phi_1)=-\mathrm i\eps\psi$ \checkmark, matching $\Delta\psi=-\mathrm i\psi$. The current \eqref{eq:Ucurrent}:
+\begin{align*}
+  \mathrm i(\psi^*\partial^\mu\psi-\psi\partial^\mu\psi^*)
+  &=\tfrac{\mathrm i}2\big[(\phi_1-\mathrm i\phi_2)(\partial^\mu\phi_1+\mathrm i\partial^\mu\phi_2)\\
+  &\qquad-(\phi_1+\mathrm i\phi_2)(\partial^\mu\phi_1-\mathrm i\partial^\mu\phi_2)\big]\\
+  &=\tfrac{\mathrm i}2\big[2\mathrm i\,\phi_1\partial^\mu\phi_2-2\mathrm i\,\phi_2\partial^\mu\phi_1\big]\\
+  &=\phi_2\partial^\mu\phi_1-\phi_1\partial^\mu\phi_2,
+\end{align*}
+agreeing with the $SO(2)$ current \checkmark.
+\end{solution}
+
+\begin{solution}{ex:trace}
+$\partial\Lag/\partial(\partial_\mu\phi)=\partial^\mu\phi$, so $T^{\mu\nu}=\partial^\mu\phi\,\partial^\nu\phi-\tfrac12g^{\mu\nu}\partial_\lambda\phi\partial^\lambda\phi$. Divergence: $\partial_\mu T^{\mu\nu}=\Box\phi\,\partial^\nu\phi+\partial^\mu\phi\,\partial_\mu\partial^\nu\phi-\partial_\lambda\phi\,\partial^\nu\partial^\lambda\phi=\Box\phi\,\partial^\nu\phi=0$ on-shell ($\Box\phi=0$) \checkmark. Trace, with $g^\mu{}_\mu=4$: $T^\mu{}_\mu=\partial_\mu\phi\partial^\mu\phi-2\,\partial_\lambda\phi\partial^\lambda\phi=-\partial_\lambda\phi\,\partial^\lambda\phi\ne0$. (In $d$ spacetime dimensions the trace is $(1-d/2)(\partial\phi)^2$, vanishing only for $d=2$.) Improved tensor: $\tilde T^{\mu\nu}=T^{\mu\nu}-\tfrac16(\partial^\mu\partial^\nu-g^{\mu\nu}\Box)\phi^2$. The added term $X^{\mu\nu}=(\partial^\mu\partial^\nu-g^{\mu\nu}\Box)\phi^2$ satisfies $\partial_\mu X^{\mu\nu}=\partial^\nu\Box\phi^2-\partial^\nu\Box\phi^2=0$ identically, so conservation is preserved. The change in $P^\nu$ is $\int\dd^3x\,X^{0\nu}$: for $\nu=0$, $X^{00}=(\partial_0^2-\Box)\phi^2=\nabla^2\phi^2$, a spatial divergence which integrates to zero; for $\nu=i$, $X^{0i}=\partial^0\partial^i\phi^2=-\partial_t\partial_i\phi^2$, also a spatial derivative, so zero. Trace: $X^\mu{}_\mu=(\Box-4\Box)\phi^2=-3\Box\phi^2$, so $\tilde T^\mu{}_\mu=-(\partial\phi)^2+\tfrac12\Box\phi^2$. Now $\Box\phi^2=2\partial_\mu\phi\partial^\mu\phi+2\phi\Box\phi=2(\partial\phi)^2$ on-shell. Hence $\tilde T^\mu{}_\mu=-(\partial\phi)^2+(\partial\phi)^2=0$ \checkmark. The tracelessness reflects the classical scale (conformal) invariance of the massless scalar in $3+1$ dimensions.
+\end{solution}
+
+\begin{solution}{ex:boostforce}
+$\delta x=\eps t$, $\delta\dot x=\eps$. $\delta L=m\dot x\,\eps+f\,\eps t=\eps\diff{}{t}\big(mx+\tfrac12ft^2\big)$, so $F=mx+\tfrac12ft^2$. Charge: $Q=p\,K-F=m\dot x\,t-mx-\tfrac12ft^2$. Check: $\dot Q=m\ddot x\,t+m\dot x-m\dot x-ft=t(m\ddot x-f)=0$ since the equation of motion is $m\ddot x=f$ \checkmark. Interpretation: explicitly $x(t)=x_0+v_0t+\tfrac{f}{2m}t^2$, $\dot x=v_0+ft/m$, so $Q=m(v_0+ft/m)t-m x_0-mv_0t-\tfrac12ft^2-\tfrac12ft^2=-mx_0$: $Q$ is minus $m$ times the position at $t=0$, which labels the trajectory. As in the free case, the boost charge says that the ``centre'' follows a prescribed motion.
+\end{solution}
+
+\begin{solution}{ex:continuity}
+Integrate $\partial_tJ^0=-\nabla\cdot\vect J$ over the fixed region $V$: $\dot Q_V=\int_V\partial_tJ^0\,\dd^3x=-\int_V\nabla\cdot\vect J\,\dd^3x=-\oint_S\vect J\cdot\dd\vect S$ by the divergence theorem. The right-hand side is the net flux of $\vect J$ out of $V$, so $Q_V$ decreases exactly when charge leaves through $S$: there is no way for $Q_V$ to change other than by flow across the boundary (local conservation). For $V=\mathbb R^3$, $S$ is at infinity, where $\vect J\to0$ fast enough ($|\vect J|r^2\to0$), so the flux vanishes and $\dot Q=0$. Note that local conservation is stronger than global conservation: a global $Q$ could in principle stay constant while charge disappears here and reappears elsewhere; $\partial_\mu J^\mu=0$ forbids that. It is also what is required by relativity, since ``simultaneously'' is observer-dependent.
+\end{solution}
+
+\begin{solution}{ex:time-dep}
+$H=\sum p_i\dot q_i-L$. Then $\dot H=\sum(\dot p_i\dot q_i+p_i\ddot q_i)-\sum\big(\partial_{q_i}L\,\dot q_i+\partial_{\dot q_i}L\,\ddot q_i\big)-\partial_tL=\sum(\dot p_i-\partial_{q_i}L)\dot q_i-\partial_tL=-\partial_tL$ on-shell (since $p_i=\partial_{\dot q_i}L$ cancels the $\ddot q$ terms and $\dot p_i=\partial_{q_i}L$). For $L=\tfrac12m\dot x^2-\tfrac12k(t)x^2$: $\dot H=\tfrac12\dot kx^2\ne0$. Noether: under $x\to x+\eps\dot x$, $\delta L=\eps\big(\dd L/\dd t-\partial_tL\big)=\eps\,\dd L/\dd t+\tfrac12\eps\dot kx^2$, and the extra term $\tfrac12\dot kx^2$ is not a total derivative of a function of $q,t$ (for arbitrary $k(t)$), so the transformation is not a symmetry in the sense of \eqref{eq:sym}. The charge $H$ then fails to be conserved by exactly $\eps\,\partial_tL$. If $k$ is constant, the extra term vanishes and $H$ is conserved \checkmark.
+\end{solution}
+
+\begin{solution}{ex:ambiguity}
+$\delta\dfrac{\dd G}{\dd t}=\diff{}{t}(\delta G)$ and $\delta G=\sum_i\eps K_i\,\partial G/\partial q_i$ since $G=G(q,t)$ and $t$ is not varied. So $\delta L'=\eps\,\dd F/\dd t+\eps\,\diff{}{t}\big(\sum_iK_i\partial_{q_i}G\big)$, i.e.\ $F'=F+\sum_iK_i\partial_{q_i}G$. The momenta change: $p'_i=\partial L'/\partial\dot q_i=p_i+\partial G/\partial q_i$, since $\dd G/\dd t=\sum_j\dot q_j\partial_{q_j}G+\partial_tG$. Therefore $Q'=\sum_ip'_iK_i-F'=\sum_ip_iK_i+\sum_iK_i\partial_{q_i}G-F-\sum_iK_i\partial_{q_i}G=Q$ \checkmark. Moral: the charge---a physical, measurable quantity---is unaffected by the total-derivative ambiguity of $L$, although $p_i$ and $F$ individually shift. (The Hamiltonian-language version is the canonical transformation $p\to p+\partial G/\partial q$.)
+\end{solution}
+
+\begin{solution}{ex:Qgenerates}
+$\pi=\partial\Lag/\partial\dot\psi=\dot\psi^*$ and $\pi^*=\dot\psi$. Then $J^0=\mathrm i(\psi^*\dot\psi-\psi\dot\psi^*)=\mathrm i(\psi^*\pi^*-\psi\pi)$, so
+\begin{equation}
+  Q=\mathrm i\int\dd^3y\,\big(\psi^*(\vect y)\pi^*(\vect y)-\psi(\vect y)\pi(\vect y)\big).
+\end{equation}
+Now the only nonvanishing bracket of $\psi(\vect x)$ is with $\pi$. So
+\begin{equation*}
+  \pb{\psi(\vect x)}{Q}=-\mathrm i\int\dd^3y\,\psi(\vect y)\,\pb{\psi(\vect x)}{\pi(\vect y)}=-\mathrm i\psi(\vect x).
+\end{equation*} Similarly, $\psi^*$ only has nonvanishing bracket with $\pi^*$, giving $\pb{\psi^*(\vect x)}{Q}=\mathrm i\psi^*(\vect x)$ by the same steps. Hence $\delta\psi=\eps\pb{\psi}{Q}=-\mathrm i\eps\psi$, the infinitesimal form of $\psi\to\mathrm e^{-\mathrm i\eps}\psi$ \checkmark. The field-theory version of ``the charge generates its symmetry''; under quantization $\pb{\cdot}{\cdot}\to-\mathrm i[\cdot,\cdot]$, giving $[\hat Q,\hat\psi]=-\hat\psi$, so $\hat\psi$ lowers the charge by one---the statement that $\hat\psi$ annihilates a particle (or creates an antiparticle).
+\end{solution}
+
+\section*{Suggested further reading}
+\begin{itemize}[nosep]
+  \item L.~Susskind and G.~Hrabovsky, \emph{The Theoretical Minimum: What You Need to Know to Start Doing Physics} (Classical Mechanics), Lecture~7 (symmetries and conservation laws) and Lecture~10 (Poisson brackets and symmetries).
+  \item H.~Goldstein, C.~Poole, J.~Safko, \emph{Classical Mechanics}, \S2.7 (conservation theorems and symmetry properties) and ch.~13 (classical field theory, including Noether's theorem for fields).
+  \item D.~Tong, \emph{Quantum Field Theory} (Cambridge lecture notes), Section~1 (classical field theory, including Noether's theorem and the energy--momentum tensor).
+  \item D.~Tong, \emph{Classical Dynamics} (Cambridge lecture notes), for the Lagrangian and Hamiltonian background.
+\end{itemize}
+
+\end{document}

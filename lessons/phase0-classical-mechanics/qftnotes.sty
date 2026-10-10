@@ -1,0 +1,65 @@
+% qftnotes.sty -- shared style for the QFT study-plan lessons
+% Uses only packages shipped with standard TeX Live / MiKTeX installs.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{qftnotes}[2026/10/10 QFT study lesson style]
+
+\RequirePackage[margin=1in]{geometry}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{lmodern}
+\RequirePackage{microtype}
+\RequirePackage{amsmath,amssymb,amsthm,mathtools}
+\RequirePackage{bm}
+\RequirePackage{xcolor}
+\RequirePackage{enumitem}
+\RequirePackage{booktabs}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\numberwithin{equation}{section}
+
+% ---------- Theorem-like environments ----------
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Worked example}[section]
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+
+% ---------- Boxes ----------
+% Key result to memorise
+\newtcolorbox{keyresult}[1][]{colback=blue!4,colframe=blue!50!black,
+  fonttitle=\bfseries,title={Key result#1},breakable}
+% Connection forward to QFT / Lancaster & Blundell
+\newtcolorbox{qftbridge}{colback=green!4,colframe=green!40!black,
+  fonttitle=\bfseries,title={Bridge to QFT},breakable}
+% Common mistake / subtlety
+\newtcolorbox{pitfall}{colback=red!3,colframe=red!50!black,
+  fonttitle=\bfseries,title={Watch out},breakable}
+
+% ---------- Exercises ----------
+% \begin{exercise}[label] ... \end{exercise}; solutions go in a final section.
+\newcounter{exercise}
+\newenvironment{exercise}[1][]{%
+  \refstepcounter{exercise}%
+  \par\medskip\noindent\textbf{Exercise \theexercise}%
+  \if\relax\detokenize{#1}\relax\else\ \textit{(#1)}\fi.\ }%
+  {\par\medskip}
+\newenvironment{solution}[1]{%
+  \par\medskip\noindent\textbf{Solution to Exercise \ref{#1}.}\ }%
+  {\par\medskip}
+
+% ---------- Notation ----------
+\newcommand{\dd}{\mathrm{d}}                        % upright differential
+\newcommand{\diff}[2]{\frac{\dd #1}{\dd #2}}        % total derivative
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}} % partial derivative
+\newcommand{\fdiff}[2]{\frac{\delta #1}{\delta #2}} % functional derivative
+\newcommand{\pb}[2]{\left\{#1,\,#2\right\}}          % Poisson bracket
+\newcommand{\comm}[2]{\left[#1,\,#2\right]}          % commutator
+\newcommand{\Lag}{\mathcal{L}}                       % Lagrangian density
+\newcommand{\Ham}{\mathcal{H}}                       % Hamiltonian density
+\newcommand{\vect}[1]{\bm{#1}}                       % 3-vector
+\newcommand{\order}[1]{\mathcal{O}\!\left(#1\right)}
+
+\endinput
